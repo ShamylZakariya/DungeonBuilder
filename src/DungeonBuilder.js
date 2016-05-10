@@ -722,7 +722,7 @@
 			wiggle = 0;
 		}
 
-		wiggle = Math.min(Math.max(wiggle, 0), 1);
+		wiggle = Math.max(wiggle, 0);
 
 		if (typeof frequency !== 'number') {
 			frequency = 1;
@@ -730,21 +730,12 @@
 
 		frequency = Math.min(Math.max(frequency, 0), 1);
 
-		console.log("DungeonBuilder::build animate: " + animate + " step: " + step + " wiggle: " + wiggle + " frequency: " + frequency);
 
-		var buildStartTime = Date.now();
 		this.seed(step, step * wiggle, frequency, rng);
 
 		var onDone = function () {
-			var endTime = Date.now();
-			var seconds = (endTime - buildStartTime) / 1000;
-			console.log("DungeonBuilder::build - took: " + seconds + " seconds.");
-
 			this.harness.updateDisplayCanvas();
-
-			if (!!done) {
-				done();
-			}
+			done && done();
 		}.bind(this);
 
 		if (animate) {

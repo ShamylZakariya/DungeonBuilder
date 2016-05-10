@@ -23,7 +23,7 @@
 <body>
 
 <img src="dungeon-boundary.png" width="512" height="512" id="dungeonBoundary"/>
-<script src="DungeonBuilder.js"></script>
+<script src="../src/DungeonBuilder.js"></script>
 
 <script>
 
@@ -37,19 +37,23 @@
 		return x - Math.floor(x);
 	}
 
-
 	window.onload = function() {
 
+		var buildStartTime = Date.now();
 		var mapSpec = document.getElementById("dungeonBoundary");
 
+		
 		DungeonBuilder.build(mapSpec, {
 
-			roomGridSize: 40,
-			wiggle: 1,
+			roomGridSize: 30,
+			wiggle: 2,
 			frequency: 0.5,
 			rng: rand,
 
 			done: function (resultCanvas, harness, roomInfo) {
+
+				var seconds = (Date.now() - buildStartTime) / 1000;
+				console.log("DungeonBuilder.build - took: " + seconds + " seconds.");
 
 				// add to document so we can see results
 				resultCanvas.id = "resultCanvas";
