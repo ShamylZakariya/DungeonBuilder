@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Dungeon Builder</title>
+	<style>
+		body {
+			background: #eee;
+		}
+
+		#resultCanvas {
+			width: 512px;
+			height: 512px;
+			image-rendering: pixelated;
+			box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+		}
+
+	</style>
+
+</head>
+<body>
+
+<script src="DungeonBuilder.js"></script>
+<script>
+
+	///////////////////////////////////
+	// A dumb seedable RNG to make repeatable dungeons for this demo
+
+	var _seed = 1.2;
+	function rand() {
+		var x = Math.sin(_seed++) * 10000;
+		return x - Math.floor(x);
+	}
+
+	///////////////////////////////////
+
+	var mapUrl = "dungeon-boundary.png";
+
+	DungeonBuilder.build(mapUrl, {
+
+		roomGridSize: 16,
+		wiggle: 0.9,
+		frequency: 0.5,
+		rng: rand,
+
+		done: function (resultCanvas, harness, roomInfo) {
+
+			// add to document so we can see results
+			resultCanvas.id = "resultCanvas";
+			document.body.appendChild(resultCanvas);
+
+			console.dir(roomInfo);
+		}
+	});
+
+
+
+</script>
+</body>
+</html>
