@@ -8,6 +8,10 @@
 			background: #eee;
 		}
 
+		#dungeonBoundary {
+			display: none;
+		}
+
 		#resultCanvas {
 			width: 512px;
 			height: 512px;
@@ -20,11 +24,14 @@
 </head>
 <body>
 
+<img src="dungeon-boundary.png" width="512" height="512" id="dungeonBoundary"/>
 <script src="DungeonBuilder.js"></script>
+
 <script>
 
-	///////////////////////////////////
-	// A dumb seedable RNG to make repeatable dungeons for this demo
+	/*
+	 A dumb seedable RNG to make repeatable dungeons for this demo
+	 */
 
 	var _seed = 1.2;
 	function rand() {
@@ -32,28 +39,28 @@
 		return x - Math.floor(x);
 	}
 
-	///////////////////////////////////
 
-	var mapUrl = "dungeon-boundary.png";
+	window.onload = function() {
 
-	DungeonBuilder.build(mapUrl, {
+		var boundaryImage = document.getElementById("dungeonBoundary");
 
-		roomGridSize: 16,
-		wiggle: 0.9,
-		frequency: 0.5,
-		rng: rand,
+		DungeonBuilder.build(boundaryImage, {
 
-		done: function (resultCanvas, harness, roomInfo) {
+			roomGridSize: 40,
+			wiggle: 1,
+			frequency: 0.5,
+			rng: rand,
 
-			// add to document so we can see results
-			resultCanvas.id = "resultCanvas";
-			document.body.appendChild(resultCanvas);
+			done: function (resultCanvas, harness, roomInfo) {
 
-			console.dir(roomInfo);
-		}
-	});
+				// add to document so we can see results
+				resultCanvas.id = "resultCanvas";
+				document.body.appendChild(resultCanvas);
 
-
+				console.dir(roomInfo);
+			}
+		});
+	};
 
 </script>
 </body>

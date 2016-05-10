@@ -205,7 +205,7 @@
 	 * @param g green component range [0,255]
 	 * @param b blue component range [0,255]
 	 * @param a alpha component range [0,255] (OPTIONAL, defaults to 255)
-	 * @returns {{red: (number|*), green: (number|*), blue: (number|*), alpha: (number|*), hash: string}}
+	 * @returns {PixelColor}
 	 */
 	Harness.prototype.color = function (r, g, b, a) {
 		r = Math.min(Math.max(r, 0), 255);
@@ -287,7 +287,7 @@
 		this.pointStack.push(x, y);
 	};
 
-// steps floodfill algorithm once. returns true if more steps are possible. false when complete.
+	// steps floodfill algorithm once. returns true if more steps are possible. false when complete.
 	FloodFill.prototype.stepFill = function () {
 		var pa = this.pointStack.pop();
 		if (!!pa) {
@@ -995,30 +995,96 @@
 
 	///////////////////////////////////////////////////////////////////
 
+	function _build(boundaryImage, roomGridSize, wiggle, frequency, rng, done) {
+		var minImageDim = Math.min(boundaryImage.width, boundaryImage.height);
+		var step = minImageDim / roomGridSize;
+		step = Math.min(Math.max(step, 10), minImageDim / 2);
+
+		var workingCanvas = document.createElement("canvas");
+		workingCanvas.width = boundaryImage.width;
+		workingCanvas.height = boundaryImage.height;
+
+		var workingCanvasContext = workingCanvas.getContext("2d");
+		workingCanvasContext.drawImage(boundaryImage, 0, 0);
+
+		var harness = new Harness(workingCanvas);
+		var builder = new DungeonBuilder(harness);
+		builder.build(false, step, wiggle, frequency, rng, function () {
+			harness.updateSourceCanvas();
+			if (!!done) {
+
+				// generate room info
+				var roomInfo = [];
+				var boxGrowers = builder.getRooms();
+				for (var i = 0; i < boxGrowers.length; i++) {
+					var boxer = boxGrowers[i];
+					roomInfo.push({
+						color: boxer.getColor(),
+						bounds: boxer.getBoundingBox()
+					})
+				}
+
+				var info = {
+					rooms: roomInfo,
+					voidColor: builder.voidColor,
+					floorColor: builder.floorColor
+				};
+
+				done(workingCanvas, harness, info);
+			}
+		});
+	}
+
+	/**
+	 * @typedef {object} PixelColor
+	 * @property {number} red - the red component [0,255]
+	 * @property {number} green - the green component [0,255]
+	 * @property {number} blue - the blue component [0,255]
+	 * @property {number} alpha - the alpha component [0,255]
+	 * @property {string} hash - a simple hash for this color
+	 */
+
+	/**
+	 * @typedef {object} RoomInfo
+	 * @property bounds - the room's boundary
+	 * @property bounds.width - the room's width in pixels
+	 * @property bounds.height - the room's height in pixels
+	 * @property bounds.x - the room's left x origin in the canvas in pixels
+	 * @property bounds.y - the room's top y origin in the canvas in pixels
+	 * @property {PixelColor} color - the color used to draw the room's walls
+	 */
+
 	/**
 	 * @callback buildDoneCallback
 	 * @param resultCanvas - the canvas upon which the dungeon has been rendered
 	 * @param {Harness} harness - the harness used to manipulate canvas pixel data
-	 * @param {object} info - The room info for the dungeon
+	 * @param {object} info - The room info for the dungeon.
+	 * @param {object} info.floorColor - the color representing traversable/walkable space
+	 * @param {object} info.voidColor - the color representing space "outside" the dungeon.
+	 * @param {RoomInfo[]} info.rooms - array of room info data
+	 *
 	 */
 
 	/**
 	 * Build a dungeon.
-	 * @param mapImageUrl
+	 * @param {string|Image|Element} boundaryImage - URL of an image, Image, or HTMLImageElement of loaded image in DOM to define the dungeon's boundaries
 	 * @param params - Parameters for dungeon generation
-	 * @param {function} [params.rng=Math.random] - Random number generator returing a vlaue from 0 to 1. Provide a seedable RNG to make repeatable structures.
-	 * @param {number} [params.roomGridSize=20] - The map will be divided into a grid with this many rows and columns
-	 * @param {number} [params.wiggle=0] - The room placement will be randomly offset by at most this amount. The higher the more random room generation will be
-	 * @param {number} [params.frequency=1] - The likelyhood that a room will be planted at a given location. If 1, all room seeds will be planted, at 0.5 half will be planted, etc.
+	 * @param {function} [params.rng=Math.random] - Random number generator returning a value from 0 to 1. Provide a seedable RNG to make repeatable structures.
+	 * @param {number} [params.roomGridSize=20] - The map will be divided into a grid with this many rows and columns. The smaller the number, the bigger the rooms will be.
+	 * @param {number} [params.wiggle=0] - The room placement will be randomly offset by at most this amount, ranged from 0 to 1. The higher the more random room generation will be.
+	 * @param {number} [params.frequency=1] - The likelihood that a room will be planted at a given location. If 1, all room seeds will be planted, at 0.5 half will be planted, etc. Min value is 0.1.
 	 * @param {buildDoneCallback} params.done - Callback invoked when dungeon is finished generating
-	 *
 	 */
-	function build(mapImageUrl, params) {
+	function build(boundaryImage, params) {
 
 		var roomGridSize = Math.max(typeof params.roomGridSize === 'number' ? params.roomGridSize : 20, 8);
 		var wiggle = typeof params.wiggle === 'number' ? params.wiggle : 0;
 		var frequency = typeof params.frequency === 'number' ? params.frequency : 1;
 		var done = params.done;
+
+		if (frequency <= 0) {
+			frequency = 0.1;
+		}
 
 		var rng = null;
 		if (typeof params.rng === 'function') {
@@ -1027,48 +1093,17 @@
 			rng = Math.random;
 		}
 
-		var mapImage = new Image();
-		mapImage.src = mapImageUrl;
-		mapImage.onload = function () {
+		if (boundaryImage instanceof HTMLImageElement || boundaryImage instanceof Image) {
+			_build(boundaryImage, roomGridSize, wiggle, frequency, rng, done);
+		} else if (typeof boundaryImage === "string") {
 
-			var minImageDim = Math.min(mapImage.width, mapImage.height);
-			var step = minImageDim / roomGridSize;
-			step = Math.min(Math.max(step, 10), minImageDim / 2);
-
-			var workingCanvas = document.createElement("canvas");
-			workingCanvas.width = mapImage.width;
-			workingCanvas.height = mapImage.height;
-
-			var workingCanvasContext = workingCanvas.getContext("2d");
-			workingCanvasContext.drawImage(mapImage, 0, 0);
-
-			var harness = new Harness(workingCanvas);
-			var builder = new DungeonBuilder(harness);
-			builder.build(false, step, wiggle, frequency, rng, function () {
-				harness.updateSourceCanvas();
-				if (!!done) {
-
-					// generate room info
-					var roomInfo = [];
-					var boxGrowers = builder.getRooms();
-					for (var i = 0; i < boxGrowers.length; i++) {
-						var boxer = boxGrowers[i];
-						roomInfo.push({
-							color: boxer.getColor(),
-							bounds: boxer.getBoundingBox()
-						})
-					}
-
-					var info = {
-						rooms: roomInfo,
-						voidColor: builder.voidColor,
-						floorColor: builder.floorColor
-					};
-
-					done(workingCanvas, harness, info);
-				}
-			});
+			var img = new Image();
+			img.src = boundaryImage;
+			img.onload = function () {
+				_build(img, roomGridSize, wiggle, frequency, rng, done);
+			}
 		}
+
 	}
 
 
