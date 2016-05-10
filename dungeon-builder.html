@@ -13,8 +13,6 @@
 		}
 
 		#resultCanvas {
-			width: 512px;
-			height: 512px;
 			image-rendering: pixelated;
 			box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
 		}
@@ -42,9 +40,9 @@
 
 	window.onload = function() {
 
-		var boundaryImage = document.getElementById("dungeonBoundary");
+		var mapSpec = document.getElementById("dungeonBoundary");
 
-		DungeonBuilder.build(boundaryImage, {
+		DungeonBuilder.build(mapSpec, {
 
 			roomGridSize: 40,
 			wiggle: 1,
