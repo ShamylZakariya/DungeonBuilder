@@ -46,6 +46,7 @@ Now let's say you want your dungeon to respect a general shape, but want the roo
 		});
 
 Produces:
+
 ![Star Dungeon](sample-star.png)
 
 ##Documentation
