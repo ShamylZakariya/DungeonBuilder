@@ -37,7 +37,7 @@ Now let's say you want your dungeon to respect a general shape, but want the roo
 		DungeonBuilder.build(mapSpec, {
 		
 			roomGridSize: 30,
-			wiggle: 2,
+			wiggle: 1,
 			frequency: 0.5,
 		
 			done: function (resultCanvas, harness, roomInfo) {	
