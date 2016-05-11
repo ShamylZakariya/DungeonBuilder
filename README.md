@@ -60,10 +60,10 @@ The key aspect of how DungeonBuilder works is to do with the color palette of th
  - `mapSpec`: can be an URL, an Image, an HTMLImageElement, or a `Size` in the form of `{ width:, height: }`. 
  - `params`:
  	- `roomGridSize`: {number} - the space is divided up into a grid of cells. If you pass 10, you will get 100 cells for potential rooms.
- 	 - `wiggle`: {number} [0 to 1] - room "seed" placement is wiggled randomly by the room's potential size by a random perturbation scaled by the wiggle factor. The larger the wiggle, the more random the seed placement will be.
- 	 - `frequency`: {number} [0 to 1] - with a value of 1, all "seeds" that are planted to create rooms will become rooms. With a value less than 1, the odds of a seed "taking root" are reduced. Lowering the frequency increases the randomness of the generated dungeon.
- 	 - `rng`: {function} - optional - a function which returns a random number from 0 to 1. This allows you to provide your own RNG for repeatable dungeon generation.
- 	  - `done`: {function} - invoked when the dungeon generation has completed.
+ 	- `wiggle`: {number} [0 to 1] - room "seed" placement is wiggled randomly by the room's potential size by a random perturbation scaled by the wiggle factor. The larger the wiggle, the more random the seed placement will be.
+ 	- `frequency`: {number} [0 to 1] - with a value of 1, all "seeds" that are planted to create rooms will become rooms. With a value less than 1, the odds of a seed "taking root" are reduced. Lowering the frequency increases the randomness of the generated dungeon.
+ 	- `rng`: {function} - optional - a function which returns a random number from 0 to 1. This allows you to provide your own RNG for repeatable dungeon generation.
+ 	- `done`: {function} - invoked when the dungeon generation has completed.
  	  
  	  
 The `done` callback signature is as follows:
