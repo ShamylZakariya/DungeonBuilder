@@ -31,7 +31,7 @@
 	 A dumb seedable RNG to make repeatable dungeons for this demo
 	 */
 
-	var _seed = 1.2;
+	var _seed = 1.3;
 	function rand() {
 		var x = Math.sin(_seed++) * 10000;
 		return x - Math.floor(x);
@@ -41,8 +41,8 @@
 
 		var buildStartTime = Date.now();
 		var mapSpec = document.getElementById("dungeonBoundary");
+		mapSpec = 'dungeon-boundary.png';
 
-		
 		DungeonBuilder.build(mapSpec, {
 
 			roomGridSize: 30,
