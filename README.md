@@ -11,7 +11,7 @@ Let's say you simply want to fill a rectangle with wiggly rooms:
 		DungeonBuilder.build(mapSpec, {
 
 			roomGridSize: 30,
-			wiggle: 2,
+			wiggle: 1,
 			frequency: 0.5,
 
 			done: function (resultCanvas, harness, roomInfo) {
@@ -95,7 +95,7 @@ The `roomInfo` object looks like the following:
 				for (var i = 0; i < roomInfo.rooms.length; i++) {
 					var room = roomInfo.rooms[i];
 					for (var y = room.bounds.y; y < room.bounds.y + room.bounds.height; y++) {
-						for (var x = room.bounds.x; y < room.bounds.x + room.bounds.width; x++) {
+						for (var x = room.bounds.x; x < room.bounds.x + room.bounds.width; x++) {
 												
 							if (harness.checkPixelColor(x,y,room.color) {
 								// if this pixel has the room's wall color, add a collider here
