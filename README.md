@@ -7,19 +7,20 @@ A really simple dungeon generator in javascript.
 
 Let's say you simply want to fill a rectangle with wiggly rooms:
 
-		var mapSpec = { width: 512, height: 512 };
-		DungeonBuilder.build(mapSpec, {
+```javascript
+var mapSpec = { width: 512, height: 512 };
+DungeonBuilder.build(mapSpec, {
 
-			roomGridSize: 30,
-			wiggle: 1,
-			frequency: 0.5,
+	roomGridSize: 30,
+	wiggle: 1,
+	frequency: 0.5,
 
-			done: function (resultCanvas, harness, roomInfo) {
-				// add to document so we can see results
-				document.body.appendChild(resultCanvas);
-			}
-		});
-		
+	done: function (resultCanvas, harness, roomInfo) {
+		// add to document so we can see results
+		document.body.appendChild(resultCanvas);
+	}
+});
+```		
 
 Produces:
 
@@ -30,20 +31,22 @@ Now let's say you want your dungeon to respect a general shape, but want the roo
  - "open" space where the dungeon can exist should be transparent
  - blocked off space where the dungeon can't exist should be opaque.
  
-		var mapSpec = "dungeon-boundary.png'
-		// or it can refer to an image in the DOM
-		mapSpec = document.getElementById("dungeonBoundary"); 
-		
-		DungeonBuilder.build(mapSpec, {
-		
-			roomGridSize: 30,
-			wiggle: 1,
-			frequency: 0.5,
-		
-			done: function (resultCanvas, harness, roomInfo) {	
-				document.body.appendChild(resultCanvas);
-			}
-		});
+```javascript
+var mapSpec = "dungeon-boundary.png"
+// or it can refer to an image in the DOM
+mapSpec = document.getElementById("dungeonBoundary"); 
+
+DungeonBuilder.build(mapSpec, {
+
+	roomGridSize: 30,
+	wiggle: 1,
+	frequency: 0.5,
+
+	done: function (resultCanvas, harness, roomInfo) {	
+		document.body.appendChild(resultCanvas);
+	}
+});
+```
 
 Produces:
 
@@ -83,31 +86,32 @@ The `roomInfo` object looks like the following:
  		
  You may want to use this data to generate collision shapes or to to pathfinding, etc. For example:
  
- 
-		DungeonBuilder.build(myMap, {
-		
-			roomGridSize: 20,
-			wiggle: 0.5,
-			frequency: 0.5,
-		
-			done: function (resultCanvas, harness, roomInfo) {	
 
-				for (var i = 0; i < roomInfo.rooms.length; i++) {
-					var room = roomInfo.rooms[i];
-					for (var y = room.bounds.y; y < room.bounds.y + room.bounds.height; y++) {
-						for (var x = room.bounds.x; x < room.bounds.x + room.bounds.width; x++) {
-												
-							if (harness.checkPixelColor(x,y,room.color) {
-								// if this pixel has the room's wall color, add a collider here
-								addWall(x,y)
-							} else if (harness.checkPixelColor(x,y,roomInfo.floorColor) {
-								// if this pixel is the floor, add to walkable space used by pathfinder
-								addToAStarPathfinderWalkableSpace(x,y);
-							}
-						}
+```javascript 
+DungeonBuilder.build(myMap, {
+	roomGridSize: 20,
+	wiggle: 0.5,
+	frequency: 0.5,
+
+	done: function (resultCanvas, harness, roomInfo) {	
+
+		for (var i = 0; i < roomInfo.rooms.length; i++) {
+			var room = roomInfo.rooms[i];
+			for (var y = room.bounds.y; y < room.bounds.y + room.bounds.height; y++) {
+				for (var x = room.bounds.x; x < room.bounds.x + room.bounds.width; x++) {
+										
+					if (harness.checkPixelColor(x,y,room.color) {
+						// if this pixel has the room's wall color, add a collider here
+						addWall(x,y)
+					} else if (harness.checkPixelColor(x,y,roomInfo.floorColor) {
+						// if this pixel is the floor, add to walkable space used by pathfinder
+						addToAStarPathfinderWalkableSpace(x,y);
 					}
 				}
 			}
-		}); 	
- 
- That's it!
+		}
+	}
+}); 	
+```
+
+That's it!
